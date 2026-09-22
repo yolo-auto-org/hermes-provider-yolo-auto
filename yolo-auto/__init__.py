@@ -113,7 +113,7 @@ PROFILE_FIELDS: dict[str, Any] = {
     "name": PROVIDER_ID,
     "aliases": ("yoloauto", "yolo_auto"),
     "display_name": "Yolo-Auto",
-    "description": "Yolo-Auto: flat-rate OpenAI-compatible API for Qwen and Nemotron models",
+    "description": "Yolo-Auto: flat-rate OpenAI-compatible API with live model discovery",
     "signup_url": SIGNUP_URL,
     # The final *_BASE_URL entry is the user-facing base-URL override, per the
     # Hermes provider-plugin contract.

@@ -54,7 +54,7 @@ up, and `hermes doctor` probes it against the live catalog.
 ## Use it
 
 ```bash
-hermes chat --provider yolo-auto --model qwen3.8-flash
+hermes chat --provider yolo-auto --model yolo
 ```
 
 Or pick a model interactively with `/model` after selecting Yolo-Auto.
@@ -62,14 +62,16 @@ Aliases `yoloauto` and `yolo_auto` also resolve.
 
 ## Plans and models
 
-`GET /v1/models` is plan-filtered, so the visible set depends on the key:
+Models are auto-discovered: `GET /v1/models` with your key returns exactly
+what that key can run, and the Hermes picker shows that list. Featured models:
 
 | Model | Plans | Notes |
 |---|---|---|
-| `qwen3.8-flash` | Free, paid | Default; text + image + tools |
-| `qwen3.8-27b` | Free, paid | Text + image + tools |
-| `yolo` | Paid | Alias whose upstream target may change |
-| `yolo-small` | Paid | Text-only; always thinks |
+| `yolo` | Paid | Flagship alias; text + image + tools; server-side target may change |
+| `yolo-small` | Paid | Text-only; always-on reasoning |
+
+Everything else your key has access to appears through the same discovery
+path, including free-plan models, with no curated list to keep in sync.
 
 The declared context window is 131072, the plan cap most keys carry. Pro
 plans get 262144; raise it per model with a Hermes `model_overrides` entry.
