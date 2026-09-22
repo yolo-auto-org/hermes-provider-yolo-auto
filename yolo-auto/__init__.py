@@ -50,12 +50,11 @@ DECLARED_CONTEXT_WINDOW = 131_072
 # Shown when the live GET /v1/models fetch fails or returns nothing: offline
 # starts, expired DNS, that kind of thing. The endpoint itself filters by plan,
 # so the live picker is always the honest one; this list only keeps the picker
-# non-empty when the network is not.
+# non-empty when the network is not. Only the flagship models are named here;
+# everything else exists solely through live discovery.
 FALLBACK_MODELS = (
-    "qwen3.8-flash",
     "yolo",
     "yolo-small",
-    "qwen3.8-27b",
 )
 
 # Hermes resolves per-model capabilities from the models.dev catalog, which
@@ -63,27 +62,22 @@ FALLBACK_MODELS = (
 # /model picker's reasoning badge, image routing, context-window lookup, and
 # the dashboard's /api/model/info. Values mirror what the Yolo-Auto proxy
 # actually enforces or translates per model:
-#   - all four accept tool calls (they run behind the same OpenAI-compatible
-#     gateway the agents already drive)
-#   - the Qwen family (flash, its yolo alias, 27B) accepts image input and has
-#     a thinking knob the proxy maps reasoning levels onto
-#   - yolo-small (Nemotron 3.5 Lightning) is text-only and always thinks; its
-#     request profile passes bodies through unchanged, so it advertises no
-#     level switch and Hermes should not offer one
-def _qwen_capabilities() -> dict[str, Any]:
-    return {
+#   - yolo is the flagship alias: tool calls, image input, and a thinking knob
+#     the proxy maps reasoning levels onto
+#   - yolo-small is text-only and always thinks; its request profile passes
+#     bodies through unchanged, so it advertises no level switch and Hermes
+#     should not offer one
+# Any other model your key can run still appears in the picker through live
+# discovery; Hermes falls back to its generic unknown-model handling for
+# models not declared here.
+MODEL_CAPABILITIES: dict[str, dict[str, Any]] = {
+    "yolo": {
         "supports_reasoning": True,
         "supports_vision": True,
         "supports_tools": True,
         "context_window": DECLARED_CONTEXT_WINDOW,
         "model_family": "qwen",
-    }
-
-
-MODEL_CAPABILITIES: dict[str, dict[str, Any]] = {
-    "qwen3.8-flash": _qwen_capabilities(),
-    "yolo": _qwen_capabilities(),
-    "qwen3.8-27b": _qwen_capabilities(),
+    },
     "yolo-small": {
         "supports_reasoning": True,
         "supports_vision": False,
@@ -122,13 +116,13 @@ PROFILE_FIELDS: dict[str, Any] = {
     "hostname": "yolo-auto.com",
     "auth_type": "api_key",
     "api_mode": "chat_completions",
-    # The Qwen models accept image content inside tool-result messages. This is
-    # a provider-wide wire capability flag; per-model routing reads
+    # The flagship alias accepts image content inside tool-result messages.
+    # This is a provider-wide wire capability flag; per-model routing reads
     # MODEL_CAPABILITIES, where yolo-small says False.
     "supports_vision": True,
-    # Flash is the cheap, fast, vision-capable, tool-capable default, which
-    # suits compression, title generation, and vision auxiliary calls.
-    "default_aux_model": "qwen3.8-flash",
+    # The flagship alias is vision-capable, tool-capable, and fast enough for
+    # compression, title generation, and vision auxiliary calls.
+    "default_aux_model": "yolo",
     "fallback_models": FALLBACK_MODELS,
     "model_capabilities": MODEL_CAPABILITIES,
 }

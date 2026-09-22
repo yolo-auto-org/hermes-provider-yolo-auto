@@ -62,10 +62,9 @@ class RegistrationTests(unittest.TestCase):
         # plan-filtered catalog, which is what keeps the picker honest.
         self.assertEqual(self.profile.models_url, "")
 
-    def test_fallbacks_and_aux_model_are_live_model_ids(self) -> None:
-        self.assertEqual(self.profile.default_aux_model, "qwen3.8-flash")
-        self.assertIn("qwen3.8-flash", self.profile.fallback_models)
-        self.assertIn("yolo", self.profile.fallback_models)
+    def test_fallbacks_and_aux_model_are_flagship_model_ids(self) -> None:
+        self.assertEqual(self.profile.default_aux_model, "yolo")
+        self.assertEqual(self.profile.fallback_models, ("yolo", "yolo-small"))
 
     def test_every_fallback_declares_capabilities(self) -> None:
         # A fallback model the picker can show but capabilities cannot describe
